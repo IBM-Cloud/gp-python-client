@@ -1,0 +1,10 @@
+{
+  "credentials": {
+    "url": "link",
+    "userId": "abc12345",
+    "password": "abc12345",
+    "instanceId": "abc12345",
+    "readerUserId": "abc12345",
+    "readerPassword": "abc12345"
+  }
+}

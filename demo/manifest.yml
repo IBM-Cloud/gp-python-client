@@ -1,0 +1,10 @@
+# Generated using http://cfmanigen.mybluemix.net/
+---
+applications:
+- name: gp-python-client-demo
+  memory: 128M
+  domain: mybluemix.net
+  command: python main.py
+  random-route: true
+  services:
+    - Globalization Pipeline-py-demo

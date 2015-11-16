@@ -1,0 +1,6 @@
+include LICENSE.txt tox.ini README.md CHANGES.txt
+graft test
+graft docs
+prune docs/_build
+prune demo
+global-exclude *.pyc
