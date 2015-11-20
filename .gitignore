@@ -1,0 +1,14 @@
+*.pyc
+*.egg
+.DS_Store
+MANIFEST
+__pycache__/
+docs/_build
+.cache/
+.tox/
+gp_python_client.egg-info/
+dist/
+build/
+.eggs/
+.coverage
+htmlcov/
