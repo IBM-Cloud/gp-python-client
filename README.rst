@@ -15,7 +15,7 @@
 What is this?
 -------------
 ``gp-python-client`` is the Python client for `Globalization Pipeline on IBM
-Bluemix <https://www.ng.bluemix.net/docs/services/Globalization/index.html>`_.
+Bluemix <https://www.ng.bluemix.net/docs/services/GlobalizationPipeline/index.html>`_.
 
 IBM® Globalization provides machine translation and editing capabilities that
 enable you to rapidly create, maintain, and revise translations for your
@@ -33,7 +33,7 @@ Getting started
 To get started, you should first become familiar with the service itself. A
 good place to begin is by reading the `Getting Started with IBM Globalization
 documentation
-<https://www.ng.bluemix.net/docs/services/Globalization/index.html>`_.
+<https://www.ng.bluemix.net/docs/services/GlobalizationPipeline/index.html>`_.
 
 The documentation explains how to create a new service instance, create
 a new bundle, upload your source text and much more.
