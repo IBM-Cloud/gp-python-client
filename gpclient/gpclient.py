@@ -241,21 +241,23 @@ class GPClient():
         httpStatus = r.status_code
         logging.info('HTTP status code: %s', httpStatus)
 
-        jsonR = r.json()
-        if jsonR:
-            statusStr = 'REST response status: %s' % \
-                jsonR.get(self.__RESPONSE_STATUS_KEY)
-            msgStr = 'REST response message: %s' % \
-                jsonR.get(self.__RESPONSE_MESSAGE_KEY)
-            if httpStatus == requests.codes.ok:
+        if httpStatus == requests.codes.ok:
+            jsonR = r.json()
+            if jsonR:
+                statusStr = 'REST response status: %s' % \
+                    jsonR.get(self.__RESPONSE_STATUS_KEY)
+                msgStr = 'REST response message: %s' % \
+                    jsonR.get(self.__RESPONSE_MESSAGE_KEY)
                 logging.info(statusStr)
                 logging.info(msgStr)
                 return jsonR
             else:
-                logging.warning(statusStr)
-                logging.warning(msgStr)
+                logging.warning('Unable to parse JSON body.')
+                logging.warning(r.text)
                 return None
         else:
+            logging.warning('Invalid HTTP status code.')
+            logging.warning(r.text)
             return None
 
     def __get_bundles_data(self):
