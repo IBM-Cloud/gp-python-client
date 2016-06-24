@@ -1,4 +1,4 @@
-<!-- Copyright IBM Corp. 2015
+<!-- Copyright IBM Corp. 2015, 2016
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
@@ -116,6 +116,10 @@ en_US
 
 For the above example, the language code is `en_US` - where `en` is the language subtag, and `US` is the region subtag.
 
+Running Tests
+-------------
+Refer to [test/README.md](./test/README.md).
+
 Generating documentation
 ------------------------
 Documentation can be generated using [Sphinx](http://www.sphinx-doc.org).
@@ -173,12 +177,22 @@ Use the following command:
 $ pandoc --from markdown --to rst README.md -o README.rst
 ```
 
-Running Tests
--------------
-Refer to [test/README.md](./test/README.md).
+Contributing
+------------
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-End Notes
-----------
-You are most welcome to [submit issues](https://github.com/IBM-Bluemix/gp-python-client/issues), or [fork the repository](https://github.com/IBM-Bluemix/gp-python-client).
+License
+-------
+Apache 2.0. See [LICENSE.txt](LICENSE.txt).
 
-`gp-python-client` is published under the [Apache License Version 2.0](https://github.com/IBM-Bluemix/gp-python-client/blob/master/LICENSE.txt).
+> Licensed under the Apache License, Version 2.0 (the "License");
+> you may not use this file except in compliance with the License.
+> You may obtain a copy of the License at
+> 
+> http://www.apache.org/licenses/LICENSE-2.0
+> 
+> Unless required by applicable law or agreed to in writing, software
+> distributed under the License is distributed on an "AS IS" BASIS,
+> WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+> See the License for the specific language governing permissions and
+> limitations under the License.
