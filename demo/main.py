@@ -12,16 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os, locale, logging, json, gettext
+import os, logging
 from gpclient import GPClient, GPServiceAccount, GPTranslations
-from flask  import Flask, render_template
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
+
 @app.route('/')
 @app.route('/index.html')
-def demo():
-    ## 1 - create GPServiceAccount
+def root():
+    # 1 - create GPServiceAccount
+    # if the app is running on Bluemix, the credentials will be obtained
+    # from the VCAP environment variable
     acc = None
     try:
         acc = GPServiceAccount()
@@ -29,34 +32,39 @@ def demo():
         logging.error('Unable to create GPServiceAccount')
         return
 
-    ## 2 - create Globalization Pipeline client
+    # 2 - create Globalization Pipeline client
+    # the client is responsible for communication with the service
     client = GPClient(acc)
 
-    # bundle containing the source strings
     bundleId='demo'
 
+    # for the demo, get all avalible languages in the bundle
+    # normally, this should equal to the language of the locale
     languages = client.get_avaliable_languages(bundleId=bundleId)
 
     messages = []
 
     for language in languages:
-        ## 3 - create translation instance
+        # 3 - create translation instance
         # Note: because we are displaying the translations for all avalible
         # languages, a new translation instance is create each time;
         # normally, only one instance for the language of choice is required
         t = client.translation(bundleId=bundleId, languages=[language])
+
+        # 4 - create a shortcut for the function
         _ = t.gettext
 
-        # get the translated value from Globalization Pipeline service
-        welcomeValue =  _('welcome')
+        # 5 - get the translated value from Globalization Pipeline service
+        # by calling the shortcut
+        translatedValue = _('welcome')
 
-        messages.append({'language': language,
-                        'welcome': welcomeValue})
+        messages.append({'language': language, 'welcome': translatedValue})
 
     return render_template('index.html', messages=messages)
 
+# Run app
 # VCAP_APP_PORT should be set by bluemix
 port = os.getenv('VCAP_APP_PORT', '5000')
 if __name__ == '__main__':
     # listen to all public IPs on specified port
-	app.run(host='0.0.0.0', port=int(port))
+    app.run(host='0.0.0.0', port=int(port))

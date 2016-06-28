@@ -24,13 +24,13 @@ Prepare demo
 -------------
 In order to run the demo, you must first create a new Globalization Pipeline
 service instance. You can name the instance whatever you'd like, but the
-``manifest.yml`` file must be updated to reflect the name, currently the
-service instance name is ``Globalization Pipeline-py-demo``.
+manifest.yml` file must be updated to reflect the name, currently the
+service instance name is `Globalization Pipeline-py-demo.
 
-Next, create a new bundle in this instance and name is ``demo``; you can use
-another name, but ``main.py`` must then be updated accordingly.
+Next, create a new bundle in this instance and name it `demo`; you can use
+another name, but `main.py` must then be updated accordingly.
 
-Use ``messages.json`` as the source file and select as many target languages
+Use `messages.json` as the source file and select as many target languages
 as you'd like.
 
 Run the demo
@@ -40,4 +40,4 @@ Once the necessary files have been updated. You can push the app to Bluemix.
 You can either use the cf cli or push to Bluemix using git. You can search
 around on Bluemix for the necessary documentation.
 
-If you use the cf cli, simply go to the demo dir and run ``cf push``.
+If you use the cf cli, simply go to the demo dir and run `cf push`.
