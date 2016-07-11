@@ -1,25 +1,51 @@
 <html>
-	<head>
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='stylesheet.css') }}">
-		<title>gp-python-client-demo</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	</head>
 
-	<body>
-    <div id="title">
-      <a href="https://github.com/IBM-Bluemix/gp-python-client">
-        <h1>gp-python-client</h1>
-      </a>
-      <h1>Demo</h1>
+<head>
+    <title>gp-python-client-demo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.css">
+
+    <style media="screen">
+    .github-fork-ribbon:before {
+        background-color: black;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div style="margin-top:10%; text-align: center;">
+            <h2>gp-python-client demo</h2>
+        </div>
+
+        <!-- IGNORE - ribbons -->
+        <a class="github-fork-ribbon left-top" href="https://github.com/IBM-Bluemix/gp-common" title="Globalization Pipeline">Globalization Pipeline</a>
+        <a class="github-fork-ribbon" href="https://github.com/IBM-Bluemix/gp-python-client" title="gp-python-client">gp-python-client</a>
+
+        <br><br>
+
+        {% for message in messages %}
+        <div class="row">
+            <div class="four columns"> <p> </p></div>
+
+            <div class="two columns">
+                <button class="button-primary">
+                    {{ message.language }}
+                </button>
+            </div>
+
+            <div class="six columns">
+                <button>
+                    {{ message.welcome }}
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+
     </div>
+</body>
 
-    <br>
-
-		{% for message in messages %}
-    <div class="floating-box">
-		    <h3> {{ message.language }}: {{ message.welcome }}</h3>
-    </div>
-		{% endfor %}
-
-  </body>
 </html>
