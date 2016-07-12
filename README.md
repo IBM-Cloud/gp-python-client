@@ -177,6 +177,11 @@ Use the following command:
 $ pandoc --from markdown --to rst README.md -o README.rst
 ```
 
+Community
+---------
+* View or file GitHub [Issues](https://github.com/IBM-Bluemix/gp-python-client/issues)
+* Connect with the open source community on [developerWorks Open](https://developer.ibm.com/open/ibm-bluemix-globalization-pipeline-service/python-sdk/)
+
 Contributing
 ------------
 See [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -188,9 +193,9 @@ Apache 2.0. See [LICENSE.txt](LICENSE.txt).
 > Licensed under the Apache License, Version 2.0 (the "License");
 > you may not use this file except in compliance with the License.
 > You may obtain a copy of the License at
-> 
+>
 > http://www.apache.org/licenses/LICENSE-2.0
-> 
+>
 > Unless required by applicable law or agreed to in writing, software
 > distributed under the License is distributed on an "AS IS" BASIS,
 > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
