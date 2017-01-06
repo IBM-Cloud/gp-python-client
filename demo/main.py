@@ -63,7 +63,7 @@ def root():
     return render_template('index.html', messages=messages)
 
 # Run app
-# VCAP_APP_PORT should be set by bluemix
+# PORT env var should be set by bluemix
 port = os.getenv('PORT', '5000')
 if __name__ == '__main__':
     # listen to all public IPs on specified port
