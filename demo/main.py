@@ -64,7 +64,7 @@ def root():
 
 # Run app
 # VCAP_APP_PORT should be set by bluemix
-port = os.getenv('VCAP_APP_PORT', '5000')
+port = os.getenv('PORT', '5000')
 if __name__ == '__main__':
     # listen to all public IPs on specified port
     app.run(host='0.0.0.0', port=int(port))
