@@ -1,4 +1,4 @@
-# Copyright IBM Corp. 2015
+# Copyright IBM Corp. 2015, 2017
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json, os, logging, re
+import json
+import os
+import logging
+import re
 
 class GPServiceAccount():
     """Holds authentication details for connecting to the Globalization
@@ -56,35 +59,42 @@ class GPServiceAccount():
     __instanceId = None
     __userId = None
     __password = None
+    
+    def __setcreds__(self, url, instanceId, userId, password):
+        self.__url = url
+        self.__instanceId = instanceId
+        self.__userId = userId
+        self.__password = password
 
     def __init__(self, url=None, instanceId=None, userId=None, password=None,
-        serviceInstanceName=None):
+                 serviceInstanceName=None, credentialsJson=None):
+        credentialsSet = False
         if url and instanceId and userId and password:
-            self.__url = url
-            self.__instanceId = instanceId
-            self.__userId = userId
-            self.__password = password
+            self.__setcreds__(url, instanceId, userId, password)
+            credentialsSet = True
             logging.info('using user provided data to create GPServiceAccount')
-        else:
+        if not credentialsSet:
             (url, instanceId, userId, password) = self.__get_user_env_vars()
             if url and instanceId and userId and password:
-                self.__url = url
-                self.__instanceId = instanceId
-                self.__userId = userId
-                self.__password = password
+                self.__setcreds__(url, instanceId, userId, password)
+                credentialsSet = True
                 logging.info("""using user defined environment variables to
                     create GPServiceAccount""")
-            else:
+        if not credentialsSet and serviceInstanceName is not None:
                 (url, instanceId, userId, password) = \
                     self.__parse_vcap_services_env_var(serviceInstanceName)
                 if url and instanceId and userId and password:
-                    self.__url = url
-                    self.__instanceId = instanceId
-                    self.__userId = userId
-                    self.__password = password
+                    self.__setcreds__(url, instanceId, userId, password)
+                    credentialsSet = True
                     logging.info("""using VCAP_SERVICES environment variable to
                         create GPServiceAccount""")
-
+        if not credentialsSet and credentialsJson is not None:
+            (url, instanceId, userId, password) = self.__get_credentials_from_file(credentialsJson)
+            if url and instanceId and userId and password:
+                self.__setcreds__(url, instanceId, userId, password)
+                credentialsSet = True
+                logging.info("""using user defined environment variables to
+                    create GPServiceAccount""")
         # make sure that all the vars are set
         assert self.__url, ('url is not a string: <%s>')
         assert self.__instanceId, ('instanceId is not a string: <%s>')
@@ -110,6 +120,14 @@ class GPServiceAccount():
     def get_password(self):
         """Return the ``password`` being used by this ``GPServiceAccount``"""
         return self.__password
+    
+    def __get_credentials_from_file(self, credsFile):
+        credsJson = open(credsFile, "r")
+        credentials = json.load(credsJson)
+        if credentials:
+            return (credentials["url"], credentials["instanceId"], credentials["userId"], credentials["password"])
+        return (None, None, None, None)
+            
 
     def __get_user_env_vars(self):
         """Return the user defined environment variables"""

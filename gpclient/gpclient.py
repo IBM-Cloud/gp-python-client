@@ -1,4 +1,4 @@
-# Copyright IBM Corp. 2015
+# Copyright IBM Corp. 2015, 2017
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,14 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json, logging, requests, datetime, hmac, base64
-from gettext            import NullTranslations, \
-                               translation as local_translation
-from babel              import Locale, negotiate_locale
-from babel.dates        import format_datetime
-from hashlib            import sha1
-from .gptranslations    import GPTranslations
-from .gpserviceaccount  import GPServiceAccount
+import json
+import logging
+import requests
+import datetime
+import hmac
+import base64
+from gettext import NullTranslations, \
+                    translation as local_translation
+from babel import Locale, negotiate_locale
+from babel.dates import format_datetime
+from hashlib import sha1
+from bravado.requests_client import RequestsClient
+from bravado.client import SwaggerClient
+from .gptranslations import GPTranslations
+from .gpserviceaccount import GPServiceAccount
+
 
 class GPClient():
     """Handles interaction with the Globalization Pipeline (GP) service
@@ -47,28 +55,29 @@ class GPClient():
     time, only Reader-type accounts are allowed to use Basic authentication.
     """
 
-    BASIC_AUTH                      = 'basic'
-    HMAC_AUTH                       = 'HMAC'
+    BASIC_AUTH = 'basic'
+    HMAC_AUTH = 'HMAC'
 
-    __RFC1123_FORMAT                = 'EEE, dd LLL yyyy HH:mm:ss'
+    __RFC1123_FORMAT = 'EEE, dd LLL yyyy HH:mm:ss'
+    __ENCODINGFORMAT = 'utf-8'
 
-    __BUNDLES_PATH                  = '/v2/bundles'
+    __BUNDLES_PATH = '/v2/bundles'
 
-    __AUTHORIZATION_HEADER_KEY      = 'Authorization'
-    __DATE_HEADER_KEY               = 'Date'
+    __AUTHORIZATION_HEADER_KEY = 'Authorization'
+    __DATE_HEADER_KEY = 'GP-Date'
 
-    __RESPONSE_STATUS_KEY           = 'status'
-    __RESPONSE_STATUS_SUCCESS       = 'success'
-    __RESPONSE_MESSAGE_KEY          = 'message'
-    __RESPONSE_BUNDLES_KEY          = 'bundleIds'
-    __RESPONSE_BUNDLE_KEY           = 'bundle'
-    __RESPONSE_PROJECT_ID           = 'id'
+    __RESPONSE_STATUS_KEY = 'status'
+    __RESPONSE_STATUS_SUCCESS = 'success'
+    __RESPONSE_MESSAGE_KEY = 'message'
+    __RESPONSE_BUNDLES_KEY = 'bundleIds'
+    __RESPONSE_BUNDLE_KEY = 'bundle'
+    __RESPONSE_PROJECT_ID = 'id'
     __RESPONSE_TARGET_LANGUAGES_KEY = 'targetLanguages'
-    __RESPONSE_SRC_LANGUAGE_KEY     = 'sourceLanguage'
+    __RESPONSE_SRC_LANGUAGE_KEY = 'sourceLanguage'
     __RESPONSE_RESOURCE_STRINGS_KEY = 'resourceStrings'
-    __RESPONSE_RESOURCE_ENTRY_KEY   = 'resourceEntry'
-    __RESPONSE_TRANSLATION_KEY      = 'value'
-    __RESPONSE_SOURCE_VALUE_KEY     = 'sourceValue'
+    __RESPONSE_RESOURCE_ENTRY_KEY = 'resourceEntry'
+    __RESPONSE_TRANSLATION_KEY = 'value'
+    __RESPONSE_SOURCE_VALUE_KEY = 'sourceValue'
 
     __serviceAccount = None
     __cacheTimeout = 10
@@ -80,6 +89,7 @@ class GPClient():
 
         self.__serviceAccount = serviceAccount
         self.__cacheTimeout = cacheTimeout
+        self.__schemaUrl = serviceAccount.get_url()+"/swagger.json"
         self.__auth = auth
 
     def __get_language_match(self, languageCode, languageIds):
@@ -121,9 +131,9 @@ class GPClient():
             #    one of them must not be None, i.e. do not allow None == None
             if locale.language == nLanguageId.language and \
                 (((locale.script or nLanguageId.script) and
-                (locale.script == nLanguageId.script)) or \
-                (locale.territory or nLanguageId.territory) and
-                (locale.territory == nLanguageId.territory)):
+                 (locale.script == nLanguageId.script)) or \
+                 (locale.territory or nLanguageId.territory) and
+                 (locale.territory == nLanguageId.territory)):
                     return languageId
 
         return None
@@ -135,10 +145,11 @@ class GPClient():
 
     def __get_RFC1123_date(self):
         now = datetime.datetime.utcnow()
-        return format_datetime(now, self.__RFC1123_FORMAT, locale='en') + ' GMT'
+        return format_datetime(now, self.__RFC1123_FORMAT, locale='en') \
+            + ' GMT'
 
     def __get_gaas_hmac_headers(self, method, url, date=None, body=None,
-        secret=None, userId=None):
+                                secret=None, userId=None):
         """Note: this documentation was copied for the Java client for GP.
 
         Generate GaaS HMAC credentials used for HTTP Authorization header.
@@ -181,24 +192,23 @@ class GPClient():
         if not date:
             date = self.__get_RFC1123_date()
 
-        message = str(method) + '\n'+ \
-                  str(url) + '\n' + \
-                  str(date) + '\n'
-
+        message = str(method) + '\n' + \
+            str(url) + '\n' + \
+            str(date) + '\n'
         if body:
             message += str(body)
 
         if not secret:
             secret = self.__serviceAccount.get_password()
-        secret = bytes(secret.encode('utf-8'))
-        message = bytes(message.encode('utf-8'))
+        secret = bytes(secret.encode(self.__ENCODINGFORMAT))
+        message = bytes(message.encode(self.__ENCODINGFORMAT))
         digest = hmac.new(secret, message, sha1).digest()
-        urlSafeHmac =  base64.b64encode(digest).strip()
+        urlSafeHmac = base64.b64encode(digest).strip()
 
         if not userId:
             userId = self.__serviceAccount.get_user_id()
-        urlSafeHmac = urlSafeHmac.strip().decode('utf-8')
-        authorizationValue = 'GaaS-HMAC ' + userId + ':' + urlSafeHmac
+        urlSafeHmac = urlSafeHmac.strip().decode(self.__ENCODINGFORMAT)
+        authorizationValue = 'GP-HMAC ' + userId + ':' + urlSafeHmac
 
         headers = {
             self.__AUTHORIZATION_HEADER_KEY: str(authorizationValue),
@@ -206,15 +216,13 @@ class GPClient():
         }
 
         return headers
-
-    def __perform_rest_get_call(self, requestURL, params=None, headers=None):
-        """Returns the JSON representation of the response if the response
-        status was ok, returns ``None`` otherwise.
+    
+    def __prepare_gprest_call(self, requestURL, params=None, headers=None, restType='GET', body=None):
+        """Returns Authorization type and GP headers
         """
-
         if self.__auth == self.BASIC_AUTH:
             auth = (self.__serviceAccount.get_user_id(),
-                self.__serviceAccount.get_password())
+                    self.__serviceAccount.get_password())
         elif self.__auth == self.HMAC_AUTH:
             auth = None
 
@@ -224,24 +232,26 @@ class GPClient():
             fakeRequest.prepare_url(requestURL, params=params)
             preparedUrl = fakeRequest.url
 
-            hmacHeaders= self.__get_gaas_hmac_headers(method='GET',
-                url=preparedUrl)
-
-            if headers:
+            hmacHeaders = self.__get_gaas_hmac_headers(method=restType,
+                                                       url=preparedUrl, body=body)
+            if not headers is None:
                 headers.update(hmacHeaders)
             else:
                 headers = hmacHeaders
+        return auth, headers
 
-        r = requests.get(requestURL, auth=auth, headers=headers, params=params)
-
+    def __process_gprest_response(self, r=None, restType='GET'):
+        """Returns the processed response for rest calls
+        """
         if r is None:
-            logging.info('No response for REST GET request')
+            logging.info('No response for REST '+restType+' request')
             return None
 
         httpStatus = r.status_code
         logging.info('HTTP status code: %s', httpStatus)
 
-        if httpStatus == requests.codes.ok:
+        if httpStatus == requests.codes.ok or \
+            httpStatus == requests.codes.created:
             jsonR = r.json()
             if jsonR:
                 statusStr = 'REST response status: %s' % \
@@ -255,18 +265,34 @@ class GPClient():
                 logging.warning('Unable to parse JSON body.')
                 logging.warning(r.text)
                 return None
-        else:
-            logging.warning('Invalid HTTP status code.')
-            logging.warning(r.text)
-            return None
+        logging.warning('Invalid HTTP status code.')
+        logging.warning(r.text)
+        return r.json()
+        
+    def __perform_rest_call(self, requestURL, params=None, headers=None, restType='GET', body=None):
+        """Returns the JSON representation of the response if the response
+        status was ok, returns ``None`` otherwise.
+        """
+        auth, headers = self.__prepare_gprest_call(requestURL, params=params, headers=headers, restType=restType, body=body)
+        if restType == 'GET':
+            r = requests.get(requestURL, auth=auth, headers=headers, params=params)
+        elif restType == 'PUT':
+            r = requests.put(requestURL, data=body, auth=auth, headers=headers, params=params)
+        elif restType == 'POST':
+            r = requests.post(requestURL, data=body, auth=auth, headers=headers, params=params)
+        elif restType == 'DELETE':
+            r = requests.delete(requestURL, auth=auth, headers=headers, params=params)
+        resp = self.__process_gprest_response(r, restType=restType)
+        return resp
 
     def __get_bundles_data(self):
         """``GET {url}/{serviceInstanceId}/v2/bundles``
 
         Gets a list of bundle IDs.
         """
+        
         url = self.__get_base_bundle_url()
-        response = self.__perform_rest_get_call(requestURL=url)
+        response = self.__perform_rest_call(requestURL=url)
 
         if not response:
             return None
@@ -281,7 +307,7 @@ class GPClient():
         Gets the bundle's information.
         """
         url = self.__get_base_bundle_url() + '/' + bundleId
-        response = self.__perform_rest_get_call(requestURL=url)
+        response = self.__perform_rest_call(requestURL=url)
 
         if not response:
             return None
@@ -298,8 +324,8 @@ class GPClient():
         value is not available.
         """
         url = self.__get_base_bundle_url() + '/' + bundleId + '/' + languageId
-        params = {'fallback':'true'} if fallback else None
-        response = self.__perform_rest_get_call(requestURL=url, params=params)
+        params = {'fallback': 'true'} if fallback else None
+        response = self.__perform_rest_call(requestURL=url, params=params)
 
         if not response:
             return None
@@ -309,16 +335,16 @@ class GPClient():
         return languageData
 
     def __get_resource_entry_data(self, bundleId, languageId, resourceKey,
-        fallback=False):
+                                  fallback=False):
         """``GET /{serviceInstanceId}/v2/bundles/{bundleId}/{languageId}
         /{resourceKey}``
 
         Gets the resource entry information.
         """
-        url = self.__get_base_bundle_url() + '/' + bundleId + '/' + languageId \
-            + '/' + resourceKey
-        params = {'fallback':'true'} if fallback else None
-        response = self.__perform_rest_get_call(requestURL=url, params=params)
+        url = self.__get_base_bundle_url() + '/' + bundleId + '/' \
+              + languageId + '/' + resourceKey
+        params = {'fallback': 'true'} if fallback else None
+        response = self.__perform_rest_call(requestURL=url, params=params)
 
         if not response:
             return None
@@ -327,17 +353,12 @@ class GPClient():
 
         return resourceEntryData
 
-    def __get_bundles(self):
-        """Returns list of avaliable bundles """
-        bundleIds = self.__get_bundles_data()
-
-        return bundleIds if bundleIds else []
-
     def __has_language(self, bundleId, languageId):
         """Returns ``True`` if the bundle has the language, ``False`` otherwise
         """
         return True if self.__get_language_data(bundleId=bundleId,
-            languageId=languageId) else False
+                                                languageId=languageId) \
+                    else False
 
     def __get_keys_map(self, bundleId, languageId, fallback=False):
         """Returns key-value pairs for the specified language.
@@ -361,6 +382,12 @@ class GPClient():
         value = resourceEntryData.get(self.__RESPONSE_TRANSLATION_KEY)
 
         return value
+    
+    def get_bundles(self):
+        """Returns list of avaliable bundles """
+        bundleIds = self.__get_bundles_data()
+
+        return bundleIds if bundleIds else []
 
     def get_avaliable_languages(self, bundleId):
         """Returns a list of avaliable languages in the bundle"""
@@ -374,7 +401,85 @@ class GPClient():
         languages.append(sourceLanguage)
 
         return languages if languages else []
-
+    
+    def create_bundle(self, bundleId, data=None):
+        """Creates a bundle using Globalization Pipeline service"""
+        headers={'content-type':'application/json'}
+        url = self.__get_base_bundle_url() + "/" + bundleId
+        if data is None:
+            data = {}
+            data['sourceLanguage'] = 'en'
+            data['targetLanguages'] = []
+            data['notes']=[]
+            data['metadata']={}
+            data['partner']=''
+            data['segmentSeparatorPattern']=''
+            data['noTranslationPattern']=''
+        json_data = json.dumps(data)
+        response = self.__perform_rest_call(requestURL=url, restType='PUT', body=json_data, headers=headers)
+        return response
+        
+    def delete_bundle(self, bundleId):
+        """Returns success(True) or failure(False) on deleting 
+           a specific bundle present in the Globalization pipeline"""
+        if not bundleId:
+            return None
+        url = self.__get_base_bundle_url() + "/" + bundleId
+        response = self.__perform_rest_call(requestURL=url, restType='DELETE')
+        return response
+    
+    def update_bundle_info(self, bundleId, data=None):
+        """Updates the bundle config info on globalization pipeline instance"""
+        headers={'content-type':'application/json'}
+        url = self.__get_base_bundle_url() + "/" + bundleId
+        if data is None:
+            data = {}
+            data['sourceLanguage'] = 'en'
+            data['targetLanguages'] = []
+            data['notes']=[]
+            data['readOnly']='true'
+            data['metadata']={}
+            data['partner']=''
+            data['segmentSeparatorPattern']=''
+            data['noTranslationPattern']=''
+        json_data = json.dumps(data)
+        response = self.__perform_rest_call(requestURL=url, restType='POST', body=json_data, headers=headers)
+        return response
+    
+    def update_resource_entry(self, bundleId, languageId, resourceKey, data=None):
+        """Updates the resource entry for a particular key in a target language
+           for a specific bundle in the globalization pipeline"""
+        headers={'content-type':'application/json'}
+        url = self.__get_base_bundle_url() + "/" + bundleId + "/" + languageId + "/" + resourceKey
+        json_data = {}
+        if not data is None:
+            json_data = json.dumps(data)
+        response = self.__perform_rest_call(requestURL=url, restType='POST', body=json_data, headers=headers)
+        return response
+    
+    def update_resource_entries(self, bundleId, languageId, data=None):
+        """Updates a bunch of resource entries to be in sync 
+           with the key/value pairs in the globalization pipeline instance"""
+        headers={'content-type':'application/json'}
+        url = self.__get_base_bundle_url() + "/" + bundleId + "/" + languageId
+        json_data = {}
+        if not data is None:
+            json_data = json.dumps(data)
+        response = self.__perform_rest_call(requestURL=url, restType='POST', body=json_data, headers=headers)
+        return response
+    
+    def upload_resource_entries(self, bundleId, languageId, data=None):
+        """Uploads resource entries onto the globalization pipeline. 
+           Replaces all existing entries with new entries if languageId is source language
+           Updates existing matching entries if languageId is target language"""
+        headers={'content-type':'application/json'}
+        url = self.__get_base_bundle_url() + "/" + bundleId + "/" + languageId
+        json_data = {}
+        if not data is None:
+            json_data = json.dumps(data)
+        response = self.__perform_rest_call(requestURL=url, restType='PUT', body=json_data, headers=headers)
+        return response
+        
     def gp_translation(self, bundleId, languages):
         """Returns an instance of ``GPTranslations`` to be used for obtaining
         translations.
@@ -385,7 +490,6 @@ class GPClient():
         found, ``languages=['fr', 'es']``.
         """
         return self.translation(bundleId=bundleId, languages=languages)
-
 
     def translation(self, bundleId, languages, priority='gp', domain=None,
         localedir=None, class_=None, codeset=None):
@@ -475,8 +579,8 @@ class GPClient():
                         translations.add_fallback(localTranslations)
 
         if not translations:
-            logging.warning('No translations were found for bundleID <%s> and' +
-                ' languages <%s> ', bundleId, languages)
+            logging.warning('No translations were found for bundleID <%s>' \
+                            + ' and languages <%s> ', bundleId, languages)
             translations = NullTranslations()
 
         return translations

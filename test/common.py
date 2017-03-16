@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright IBM Corp. 2015
+# Copyright IBM Corp. 2015, 2017
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os, locale, json, gettext, datetime
+import os
+import locale
+import json
+import gettext
+import datetime
 from gpclient import GPClient, GPServiceAccount, GPTranslations
 
 with open('test/data/creds.json') as credsFile:
@@ -23,6 +27,8 @@ with open('test/data/creds.json') as credsFile:
 
 url = creds.get('url')
 instanceId= creds.get('instanceId')
+
+gpInstanceName = creds.get("gp-instance-name")
 
 # admin acc
 adminUserId = creds.get('userId')
@@ -53,13 +59,13 @@ def my_assert_equal(test, expected, actual, message=''):
 
 def set_user_env_vars(suffix=None):
     """Set user defined environment variables """
-    os.environ[GPServiceAccount.GP_URL_ENV_VAR] = url + suffix
+    os.environ[GPServiceAccount.GP_URL_ENV_VAR] = url+str(suffix)
     os.environ[GPServiceAccount.GP_INSTANCE_ID_ENV_VAR] = \
-        instanceId + suffix
+        instanceId+str(suffix)
     os.environ[GPServiceAccount.GP_USER_ID_ENV_VAR] = \
-        userId + suffix
+        userId+str(suffix)
     os.environ[GPServiceAccount.GP_PASSWORD_ENV_VAR] = \
-        password + suffix
+        password+str(suffix)
 
 def unset_user_env_vars():
     """Unset user defined environment variables """
@@ -105,7 +111,7 @@ def set_vcap_env_vars(suffix=None):
 
     serviceData = {}
     # instance name
-    serviceData["name"] = "Globalization Pipeline DEV-py-client-test"
+    serviceData["name"] = gpInstanceName
     serviceData["label"] = "gp-beta" # label
     serviceData["plan"] = "gp-beta-plan" # plan
     serviceData["credentials"] = credsData

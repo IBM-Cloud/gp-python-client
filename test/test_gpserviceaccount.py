@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright IBM Corp. 2015
+# Copyright IBM Corp. 2015, 2017
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import locale, gettext, unittest, datetime
+import locale
+import gettext
+import unittest
+import datetime
+import os
 from gpclient   import GPClient, GPServiceAccount, GPTranslations
 from test       import common
 
@@ -80,8 +84,7 @@ class TestGPServiceAccount(unittest.TestCase):
 
         # test init method with vcap env var
         common.unset_user_env_vars()
-        acc = None
-        acc = GPServiceAccount()
+        acc = GPServiceAccount(serviceInstanceName=common.gpInstanceName)
         common.my_assert_equal(self, common.url + VCAP_KEY, acc.get_url(),
             'incorrect url from vcap env var')
         common.my_assert_equal(self, common.instanceId + VCAP_KEY,
@@ -93,6 +96,11 @@ class TestGPServiceAccount(unittest.TestCase):
         common.my_assert_equal(self, common.password + VCAP_KEY,
             acc.get_password(),
             'incorrect password from vcap env var')
-
+        
+    # @unittest.skip("skipping")
+    def test_loadCredentialsFromFile(self):
+        """Test to support loading credentials from json file"""
+        acc = GPServiceAccount(credentialsJson="test/data/local-credentials.json")
+        
 if __name__ == '__main__':
     unittest.main()

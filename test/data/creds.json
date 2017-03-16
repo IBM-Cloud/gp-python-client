@@ -1,10 +1,12 @@
 {
   "credentials": {
-    "url": "link",
-    "userId": "abc12345",
-    "password": "abc12345",
-    "instanceId": "abc12345",
-    "readerUserId": "abc12345",
-    "readerPassword": "abc12345"
+  "url": "<gp credential url>",
+  "userId": "<gp credential userid>",
+  "password": "<gp credential password>",
+  "instanceId": "<gp instance id>",
+   "readerUserId": "<gp reader user id>",
+  "readerPassword": "<gp reader password>",
+    "gp-instance-name":"Globalization Pipeline DEV-py-client-test"
+      
   }
 }
