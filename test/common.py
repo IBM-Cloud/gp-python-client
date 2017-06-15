@@ -19,25 +19,33 @@ import locale
 import json
 import gettext
 import datetime
+import requests
+import json
 from gpclient import GPClient, GPServiceAccount, GPTranslations
 
-with open('test/data/creds.json') as credsFile:
-    credsData = json.load(credsFile)
-    creds = credsData.get('credentials')
+try:
+    url = os.environ['GP_URL']
+    adminUserId = os.environ['GP_ADMIN_USER']
+    adminPassword = os.environ['GP_ADMIN_PASS']
+    userId = os.environ['GP_READER_USER']
+    password = os.environ['GP_READER_PASS']
+    instanceId = os.environ['GP_INSTANCE_ID']
+    gpInstanceName = os.environ['GP_INSTANCE_NAME']
+except:
+    with open('test/data/creds.json') as credsFile:
+        credsData = json.load(credsFile)
+        creds = credsData.get('credentials')
+    url = creds.get('url')
+    instanceId= creds.get('instanceId')
+    # admin acc
+    adminUserId = creds.get('userId')
+    adminPassword = creds.get('password')
+    # reader acc
+    userId = creds.get('readerUserId')
+    password = creds.get('readerPassword')
 
-url = creds.get('url')
-instanceId= creds.get('instanceId')
-
-gpInstanceName = creds.get("gp-instance-name")
-
-# admin acc
-adminUserId = creds.get('userId')
-adminPassword = creds.get('password')
-
-# reader acc
-userId = creds.get('readerUserId')
-password = creds.get('readerPassword')
-
+    gpInstanceName = creds.get("gp-instance-name")
+    
 # bundles in the test service
 bundleId1 = "gpclient-test-1"
 bundleId2 = "gpclient-test-2"
