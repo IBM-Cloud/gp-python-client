@@ -23,8 +23,6 @@ from gettext import NullTranslations, \
 from babel import Locale, negotiate_locale
 from babel.dates import format_datetime
 from hashlib import sha1
-from bravado.requests_client import RequestsClient
-from bravado.client import SwaggerClient
 from .gptranslations import GPTranslations
 from .gpserviceaccount import GPServiceAccount
 
@@ -216,7 +214,7 @@ class GPClient():
         }
 
         return headers
-    
+
     def __prepare_gprest_call(self, requestURL, params=None, headers=None, restType='GET', body=None):
         """Returns Authorization type and GP headers
         """
@@ -268,7 +266,7 @@ class GPClient():
         logging.warning('Invalid HTTP status code.')
         logging.warning(r.text)
         return r.json()
-        
+
     def __perform_rest_call(self, requestURL, params=None, headers=None, restType='GET', body=None):
         """Returns the JSON representation of the response if the response
         status was ok, returns ``None`` otherwise.
@@ -290,7 +288,7 @@ class GPClient():
 
         Gets a list of bundle IDs.
         """
-        
+
         url = self.__get_base_bundle_url()
         response = self.__perform_rest_call(requestURL=url)
 
@@ -382,7 +380,7 @@ class GPClient():
         value = resourceEntryData.get(self.__RESPONSE_TRANSLATION_KEY)
 
         return value
-    
+
     def get_bundles(self):
         """Returns list of avaliable bundles """
         bundleIds = self.__get_bundles_data()
@@ -401,7 +399,7 @@ class GPClient():
         languages.append(sourceLanguage)
 
         return languages if languages else []
-    
+
     def create_bundle(self, bundleId, data=None):
         """Creates a bundle using Globalization Pipeline service"""
         headers={'content-type':'application/json'}
@@ -418,16 +416,16 @@ class GPClient():
         json_data = json.dumps(data)
         response = self.__perform_rest_call(requestURL=url, restType='PUT', body=json_data, headers=headers)
         return response
-        
+
     def delete_bundle(self, bundleId):
-        """Returns success(True) or failure(False) on deleting 
+        """Returns success(True) or failure(False) on deleting
            a specific bundle present in the Globalization pipeline"""
         if not bundleId:
             return None
         url = self.__get_base_bundle_url() + "/" + bundleId
         response = self.__perform_rest_call(requestURL=url, restType='DELETE')
         return response
-    
+
     def update_bundle_info(self, bundleId, data=None):
         """Updates the bundle config info on globalization pipeline instance"""
         headers={'content-type':'application/json'}
@@ -445,7 +443,7 @@ class GPClient():
         json_data = json.dumps(data)
         response = self.__perform_rest_call(requestURL=url, restType='POST', body=json_data, headers=headers)
         return response
-    
+
     def update_resource_entry(self, bundleId, languageId, resourceKey, data=None):
         """Updates the resource entry for a particular key in a target language
            for a specific bundle in the globalization pipeline"""
@@ -456,9 +454,9 @@ class GPClient():
             json_data = json.dumps(data)
         response = self.__perform_rest_call(requestURL=url, restType='POST', body=json_data, headers=headers)
         return response
-    
+
     def update_resource_entries(self, bundleId, languageId, data=None):
-        """Updates a bunch of resource entries to be in sync 
+        """Updates a bunch of resource entries to be in sync
            with the key/value pairs in the globalization pipeline instance"""
         headers={'content-type':'application/json'}
         url = self.__get_base_bundle_url() + "/" + bundleId + "/" + languageId
@@ -467,9 +465,9 @@ class GPClient():
             json_data = json.dumps(data)
         response = self.__perform_rest_call(requestURL=url, restType='POST', body=json_data, headers=headers)
         return response
-    
+
     def upload_resource_entries(self, bundleId, languageId, data=None):
-        """Uploads resource entries onto the globalization pipeline. 
+        """Uploads resource entries onto the globalization pipeline.
            Replaces all existing entries with new entries if languageId is source language
            Updates existing matching entries if languageId is target language"""
         headers={'content-type':'application/json'}
@@ -479,7 +477,7 @@ class GPClient():
             json_data = json.dumps(data)
         response = self.__perform_rest_call(requestURL=url, restType='PUT', body=json_data, headers=headers)
         return response
-        
+
     def gp_translation(self, bundleId, languages):
         """Returns an instance of ``GPTranslations`` to be used for obtaining
         translations.
