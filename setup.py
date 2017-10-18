@@ -4,7 +4,7 @@ from os import path
 
 currentDir = path.abspath(path.dirname(__file__))
 
-with open(path.join(currentDir, 'README.rst'), encoding='utf-8') as readme:
+with open(path.join(currentDir, 'README.md'), encoding='utf-8') as readme:
     long_description = readme.read()
 
 setup(

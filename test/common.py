@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright IBM Corp. 2015
+# Copyright IBM Corp. 2015, 2017
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,24 +14,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os, locale, json, gettext, datetime
+import os
+import locale
+import json
+import gettext
+import datetime
+import requests
+import json
 from gpclient import GPClient, GPServiceAccount, GPTranslations
 
-with open('test/data/creds.json') as credsFile:
-    credsData = json.load(credsFile)
-    creds = credsData.get('credentials')
+try:
+    url = os.environ['GP_URL']
+    adminUserId = os.environ['GP_ADMIN_USER']
+    adminPassword = os.environ['GP_ADMIN_PASS']
+    userId = os.environ['GP_READER_USER']
+    password = os.environ['GP_READER_PASS']
+    instanceId = os.environ['GP_INSTANCE_ID']
+    gpInstanceName = os.environ['GP_INSTANCE_NAME']
+except:
+    with open('test/data/creds.json') as credsFile:
+        credsData = json.load(credsFile)
+        creds = credsData.get('credentials')
+    url = creds.get('url')
+    instanceId= creds.get('instanceId')
+    # admin acc
+    adminUserId = creds.get('userId')
+    adminPassword = creds.get('password')
+    # reader acc
+    userId = creds.get('readerUserId')
+    password = creds.get('readerPassword')
 
-url = creds.get('url')
-instanceId= creds.get('instanceId')
-
-# admin acc
-adminUserId = creds.get('userId')
-adminPassword = creds.get('password')
-
-# reader acc
-userId = creds.get('readerUserId')
-password = creds.get('readerPassword')
-
+    gpInstanceName = creds.get("gp-instance-name")
+    
 # bundles in the test service
 bundleId1 = "gpclient-test-1"
 bundleId2 = "gpclient-test-2"
@@ -53,13 +67,13 @@ def my_assert_equal(test, expected, actual, message=''):
 
 def set_user_env_vars(suffix=None):
     """Set user defined environment variables """
-    os.environ[GPServiceAccount.GP_URL_ENV_VAR] = url + suffix
+    os.environ[GPServiceAccount.GP_URL_ENV_VAR] = url+str(suffix)
     os.environ[GPServiceAccount.GP_INSTANCE_ID_ENV_VAR] = \
-        instanceId + suffix
+        instanceId+str(suffix)
     os.environ[GPServiceAccount.GP_USER_ID_ENV_VAR] = \
-        userId + suffix
+        userId+str(suffix)
     os.environ[GPServiceAccount.GP_PASSWORD_ENV_VAR] = \
-        password + suffix
+        password+str(suffix)
 
 def unset_user_env_vars():
     """Unset user defined environment variables """
@@ -105,7 +119,7 @@ def set_vcap_env_vars(suffix=None):
 
     serviceData = {}
     # instance name
-    serviceData["name"] = "Globalization Pipeline DEV-py-client-test"
+    serviceData["name"] = gpInstanceName
     serviceData["label"] = "gp-beta" # label
     serviceData["plan"] = "gp-beta-plan" # plan
     serviceData["credentials"] = credsData

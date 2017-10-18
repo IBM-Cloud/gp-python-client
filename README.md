@@ -90,6 +90,15 @@ Adiós
 >>>
 ```
 
+You can also provide the service credentials through a JSON file as shown in the snippet below
+
+```python
+>>> from gpclient import GPClient, GPServiceAccount
+>>>
+>>> acc = GPServiceAccount(credentialsJson="./local_credentials.json")
+>>> client = GPClient(acc)
+```
+
 Obtaining language/locale codes
 -------------------------------
 This package requires that valid (BCP47 compliant) language/locale codes be provided when asked; for example, when calling `GPClient.translation()` (see [Examples](#examples)). From these codes, the language, region, and script subtags will be extracted.

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright IBM Corp. 2015
+# Copyright IBM Corp. 2015, 2017
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import locale, gettext, unittest, datetime
+import locale
+import gettext
+import unittest
+import datetime
 from gpclient   import GPClient, GPServiceAccount, GPTranslations
 from test       import common
 
@@ -22,7 +25,29 @@ class TestGPTranslations(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        pass
+        """Setting up the globalization pipeline for testing"""
+        acc = common.get_admin_gpserviceaccount()
+        client = GPClient(acc)
+        try:
+            client.delete_bundle(common.bundleId1)
+            
+            data = {}
+            data['sourceLanguage'] = "en"
+            data['targetLanguages'] = ["fr","es-mx"]
+            data['notes']=["string"]
+            data['metadata']={}
+            data['partner']=''
+            data['segmentSeparatorPattern']='string'
+            data['noTranslationPattern']='string'
+            
+            client.create_bundle(common.bundleId1, data=data)
+            bundle1_entries = {}
+            bundle1_entries['greet']="Hello"
+            bundle1_entries['weather']="It is snowing"
+            client.upload_resource_entries(common.bundleId1,"en", data=bundle1_entries)
+            
+        except:
+            pass
 
     @classmethod
     def tearDownClass(self):
@@ -43,7 +68,7 @@ class TestGPTranslations(unittest.TestCase):
         (t, _, key, tValue) = self.common_test_caching()
 
         # check that the cache map is as expected
-        expectedCacheMap = {'greet': 'Bonjour', 'weather': "C'est snowing"}
+        expectedCacheMap = {'greet': 'Salut', 'weather': "Il neige"}
         common.my_assert_equal(self, expectedCacheMap,
             t._GPTranslations__cachedMap, 'incorrect cache map')
 
@@ -93,7 +118,7 @@ class TestGPTranslations(unittest.TestCase):
             cacheTimeout=-1)
 
         # check that the cache map is as expected
-        expectedCacheMap = {'greet': 'Bonjour', 'weather': "C'est snowing"}
+        expectedCacheMap = {'greet': 'Salut', 'weather': "Il neige"}
         common.my_assert_equal(self, expectedCacheMap,
             t._GPTranslations__cachedMap, 'incorrect cache map')
 
@@ -131,7 +156,7 @@ class TestGPTranslations(unittest.TestCase):
         # key and translated value used for testing below
         # makes it easier to change
         key = 'greet'
-        tValue = 'Bonjour' # translated value
+        tValue = 'Salut' # translated value
 
         # check that the translated value is correct
         value = _(key)
