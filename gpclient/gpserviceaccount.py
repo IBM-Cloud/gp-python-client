@@ -124,7 +124,7 @@ class GPServiceAccount():
     def __get_credentials_from_file(self, credsFile):
         credsJson = open(credsFile, "r")
         credentials = json.load(credsJson)
-        if credentials and credentials["credentials"]:
+        if credentials and "credentials" in credentials:
             # credentials: { ... }
             credentials = credentials["credentials"]
         if credentials:
