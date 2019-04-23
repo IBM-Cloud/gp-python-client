@@ -96,7 +96,7 @@ class GPServiceAccount():
                 logging.info("""using user defined environment variables to
                     create GPServiceAccount""")
         # make sure that all the vars are set
-        assert self.__url, ('url is not a string: <%s>')
+        assert self.__url, ('url is not a string: <%s>' % self.__url)
         assert self.__instanceId, ('instanceId is not a string: <%s>')
         assert self.__userId, ('userId is not a string: <%s>')
         assert self.__password, ('password is not a string: <%s>')
@@ -124,6 +124,9 @@ class GPServiceAccount():
     def __get_credentials_from_file(self, credsFile):
         credsJson = open(credsFile, "r")
         credentials = json.load(credsJson)
+        if credentials and credentials["credentials"]:
+            # credentials: { ... }
+            credentials = credentials["credentials"]
         if credentials:
             return (credentials["url"], credentials["instanceId"], credentials["userId"], credentials["password"])
         return (None, None, None, None)
