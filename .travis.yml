@@ -5,5 +5,9 @@ python:
   - "3.6"
 # command to install dependencies
 # command to run tests
+before_script:
+  curl $GP_FAKE_BROKER > test/data/creds.json
 script:
   python setup.py test
+after_script:
+  git checkout -- test/data/creds.json
