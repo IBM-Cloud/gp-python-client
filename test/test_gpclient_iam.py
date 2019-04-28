@@ -14,19 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import unittest
 
 from gpclient import GPClient
 from test import common
 
 
-class TestGPClient(unittest.TestCase):
+@common.skipIfIamTestDisabled
+class TestGPClientIam(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
         """Setting up the globalization pipeline for testing"""
-        acc = common.get_admin_gpserviceaccount()
+        acc = common.get_admin_gpserviceaccount(True)
         client = GPClient(acc)
         try:
             client.delete_bundle(common.bundleId1)
@@ -34,13 +34,13 @@ class TestGPClient(unittest.TestCase):
 
             data = {}
             data['sourceLanguage'] = "en"
-            #data['targetLanguages'] = ["fr","es-mx"]
-            data['targetLanguages'] =[]
-            data['notes']=["string"]
-            data['metadata']={}
-            data['partner']=''
-            data['segmentSeparatorPattern']='string'
-            data['noTranslationPattern']='string'
+            # data['targetLanguages'] = ["fr","es-mx"]
+            data['targetLanguages'] = []
+            data['notes'] = ["string"]
+            data['metadata'] = {}
+            data['partner'] = ''
+            data['segmentSeparatorPattern'] = 'string'
+            data['noTranslationPattern'] = 'string'
 
             client.create_bundle(common.bundleId1, data=data)
             bundle_entries = {}
@@ -65,8 +65,8 @@ class TestGPClient(unittest.TestCase):
             client.upload_resource_entries(common.bundleId2, "en", data=bundle0_entries)
 
             bundle2_entries = {}
-            bundle2_entries['exit']= u'Au revoir'
-            bundle2_entries['show']= u'Le Fil'
+            bundle2_entries['exit'] = u'Au revoir'
+            bundle2_entries['show'] = u'Le Fil'
             client.upload_resource_entries(common.bundleId2, "fr", data=bundle2_entries)
         except:
             pass
@@ -80,21 +80,13 @@ class TestGPClient(unittest.TestCase):
 
     def tearDown(self):
         pass
-        
-    #@unittest.skip("skipping")
-    def test_admin_basic_auth(self):
-        """Verify basic auth fails with admin account"""
-        acc = common.get_admin_gpserviceaccount()
-        client = GPClient(acc, auth=GPClient.BASIC_AUTH)
-        ids = client.get_bundles()
-        
-        self.assertEqual(0, len(ids), "Admin account can not use basic authentication")
 
     #@unittest.skip("skipping")
-    def test_basic_auth_translation(self):
+    def test_translation(self):
         """Test if translation works with basic auth"""
-        acc = common.get_gpserviceaccount()
-        client = GPClient(acc, auth=GPClient.BASIC_AUTH)
+        acc = common.get_gpserviceaccount(True)
+        client = GPClient(acc)
+
         languages=['fr']
 
         t = client.gp_translation(bundleId=common.bundleId2,
@@ -109,7 +101,7 @@ class TestGPClient(unittest.TestCase):
     #@unittest.skip("skipping")
     def test_create_bundle(self):
         """Test to create a new bundle"""
-        acc = common.get_admin_gpserviceaccount()
+        acc = common.get_admin_gpserviceaccount(True)
         client = GPClient(acc)
         
         tresp = client.create_bundle("test-bundle")
@@ -120,7 +112,7 @@ class TestGPClient(unittest.TestCase):
     #@unittest.skip("skipping")
     def test_delete_bundle_fail(self):
         """Test to delete a specific bundle which doesn't exist"""
-        acc = common.get_admin_gpserviceaccount()
+        acc = common.get_admin_gpserviceaccount(True)
         client = GPClient(acc)
         
         tresp = client.delete_bundle("test-bundle-notexists")
@@ -131,7 +123,7 @@ class TestGPClient(unittest.TestCase):
     #@unittest.skip("skipping")
     def test_delete_bundle_success(self):
         """Test to delete a specific bundle which exists"""
-        acc = common.get_admin_gpserviceaccount()
+        acc = common.get_admin_gpserviceaccount(True)
         client = GPClient(acc)
         
         tresp = client.delete_bundle("test-bundle")
@@ -142,7 +134,7 @@ class TestGPClient(unittest.TestCase):
     #@unittest.skip("skipping")
     def test_english_values(self):
         """Verify English values are returned when asked for"""
-        acc = common.get_gpserviceaccount()
+        acc = common.get_gpserviceaccount(True)
         client = GPClient(acc)
 
         languages=['en']
@@ -161,7 +153,7 @@ class TestGPClient(unittest.TestCase):
         """Test example 1 used in the docs"""
         #common.set_vcap_env_vars()
 
-        acc = common.get_gpserviceaccount()
+        acc = common.get_gpserviceaccount(True)
         client = GPClient(acc)
 
         languages=['fr'] # languages=[locale.getdefaultlocale()[0]]
@@ -178,7 +170,7 @@ class TestGPClient(unittest.TestCase):
     #@unittest.skip("skipping")
     def test_example_2(self):
         """Test example 2 used in the docs"""
-        acc = common.get_gpserviceaccount()
+        acc = common.get_gpserviceaccount(True)
         client = GPClient(acc)
 
         languages=['fr'] # languages=[locale.getdefaultlocale()[0]]
@@ -193,36 +185,13 @@ class TestGPClient(unittest.TestCase):
             'incorrect translated value')
         
     #@unittest.skip("skipping")
-    def test_get_gaas_hmac_headers(self):
-        """Test if the GaaS HMAC header generation is correct """
-        method = 'POST'
-        url = 'https://example.com/gaas'
-        date = 'Mon, 30 Jun 2014 00:00:00 GMT'
-        body = '{"param":"value"}'
-
-        userId = 'MyUser'
-        secret = 'MySecret'
-
-        expectedHeaders = {'GP-Date': 'Mon, 30 Jun 2014 00:00:00 GMT',
-            'Authorization': 'GP-HMAC MyUser:ONBJapYEveDZfsPFdqZHQ64GDgc='}
-
-        acc = common.get_gpserviceaccount()
-        client = GPClient(acc)
-
-        headers = client._GPClient__get_gaas_hmac_headers(  method=method,
-            url=url, date=date, body=body, secret=secret, userId=userId)
-
-        common.my_assert_equal(self, expectedHeaders, headers,
-            'incorrect GaaS HMAC headers')
-        
-    #@unittest.skip("skipping")
     def test_get_language_match(self):
         """Test the matching of langauge codes to supported langauges"""
         # supported languages in GP
         supportedLangs = ['en','de','es','fr','it', 'ja','ko', 'pt-BR',
             'zh-Hans', 'zh-Hant']
 
-        acc = common.get_gpserviceaccount()
+        acc = common.get_gpserviceaccount(True)
         client = GPClient(acc)
         get_language_match = client._GPClient__get_language_match
 
@@ -253,7 +222,7 @@ class TestGPClient(unittest.TestCase):
 
         If the key is not found, the key should be returned.
         """
-        acc = common.get_gpserviceaccount()
+        acc = common.get_gpserviceaccount(True)
         client = GPClient(acc)
 
         # should fallbcak to 'fr', 'ur' is not supported
@@ -280,7 +249,7 @@ class TestGPClient(unittest.TestCase):
     #@unittest.skip("skipping")
     def test_local_fallback(self):
         """Verify local translations are used with expected"""
-        acc = common.get_gpserviceaccount()
+        acc = common.get_gpserviceaccount(True)
         client = GPClient(acc)
 
         languages=['fo', 'fr']
@@ -298,7 +267,7 @@ class TestGPClient(unittest.TestCase):
     #@unittest.skip("skipping")
     def test_local_translations(self):
         """Verify local translations are used with expected"""
-        acc = common.get_gpserviceaccount()
+        acc = common.get_gpserviceaccount(True)
         client = GPClient(acc)
 
         languages=['fr']
@@ -313,10 +282,10 @@ class TestGPClient(unittest.TestCase):
         common.my_assert_equal(self, 'greet in French (local)', value,
             'incorrect value; should have returned local translation')
 
-    #@unittest.skipIf(common.isReaderCredNotAvailable(),"Reader credentials not available")
+    #@unittest.skip("skipping")
     def test_reader_get_bundles(self):
         """Verify bundles can not be obtained with reader acc"""
-        acc = common.get_gpserviceaccount()
+        acc = common.get_gpserviceaccount(True)
         client = GPClient(acc)
 
         expectedBundles = []
@@ -329,7 +298,7 @@ class TestGPClient(unittest.TestCase):
     #@unittest.skip("skipping")
     def test_translation_priority(self):
         """Verify that the priority option in GPClient.translation works"""
-        acc = common.get_gpserviceaccount()
+        acc = common.get_gpserviceaccount(True)
         client = GPClient(acc)
 
         languages=['fr']
@@ -359,7 +328,7 @@ class TestGPClient(unittest.TestCase):
     #@unittest.skip("skipping")
     def test_update_resource_entry(self):
         """Test to update a resource entry"""
-        acc = common.get_admin_gpserviceaccount()
+        acc = common.get_admin_gpserviceaccount(True)
         client = GPClient(acc)
         data = {}
         data['value'] = "weather in spanish"
@@ -370,7 +339,7 @@ class TestGPClient(unittest.TestCase):
     #@unittest.skip("skipping")
     def test_update_resource_entries(self):
         """Test to update resource entries"""
-        acc = common.get_admin_gpserviceaccount()
+        acc = common.get_admin_gpserviceaccount(True)
         client = GPClient(acc)
         data = {}
         data["welcome"]="Welcome"
@@ -381,7 +350,7 @@ class TestGPClient(unittest.TestCase):
     #@unittest.skip("skipping")
     def test_upload_resource_entries(self):
         """Test to upload resource entries"""
-        acc = common.get_admin_gpserviceaccount()
+        acc = common.get_admin_gpserviceaccount(True)
         client = GPClient(acc)
         data = {}
         data["welcome"]="Hello"

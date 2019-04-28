@@ -9,10 +9,10 @@ with open(path.join(currentDir, 'README.md'), encoding='utf-8') as readme:
 
 setup(
     name='gp-python-client',
-    version='1.0.0',
-    description='Python client for Globalization Pipeline on IBM Bluemix',
+    version='1.1.0',
+    description='Python client for Globalization Pipeline on IBM Cloud',
     long_description=long_description,
-    url='https://github.com/IBM-Bluemix/gp-python-client',
+    url='https://github.com/IBM-Cloud/gp-python-client',
     author='Farhan Arshad',
     author_email='icuintl@us.ibm.com',
     license='Apache License Version 2.0',

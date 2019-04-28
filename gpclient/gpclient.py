@@ -12,26 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-import logging
-import requests
+import base64
 import datetime
 import hmac
-import base64
+import json
+import logging
 from gettext import NullTranslations, \
-                    translation as local_translation
+    translation as local_translation
+from hashlib import sha1
+
+import requests
 from babel import Locale, negotiate_locale
 from babel.dates import format_datetime
-from hashlib import sha1
-from .gptranslations import GPTranslations
+
 from .gpserviceaccount import GPServiceAccount
+from .gptranslations import GPTranslations
 
 
 class GPClient():
     """Handles interaction with the Globalization Pipeline (GP) service
     instance. ``serviceAccount`` must be of type ``GPServiceAccount`` and will
     be used to obtain the necessary credentials required for contacting the
-    Globalization Pipeline service instance.
+    Globalization Pipeline service instance. Access to Globalization Pipeline RC enabled service instances for users in
+    is controlled by IBM Cloud Identity and Access Management (IAM) and/or Globalization Pipeline
+    Authentication. Whereas for CF instances only Globalization Pipeline Authentication can be used.
 
     The caching feature may be used to cache translated values locally
     in order to reduce the number of calls made to the GP service. The
@@ -43,13 +47,17 @@ class GPClient():
 
     The default ``cacheTimeout`` value is ``10`` minutes
 
-    The type of authentication to use for requests can also be specified.
-    Currently, the following are supported:
+    The type of Globalization Pipeline authentication mechanism to use for requests can
+    also be specified. Currently, the following are supported:
 
     * HMAC authentication: ``auth=GPClient.HMAC_AUTH``
     * HTTP Basic Access authentication: ``auth=GPClient.BASIC_AUTH``
 
-    The default ``auth`` value is ``GPClient.HMAC_AUTH``. Note, at this
+    If the ``serviceAccount`` is initialized with IAM credentials, the client
+    will use IAM authentication and ignore the ``auth`` specified.
+
+    The default ``auth`` value is ``GPClient.HMAC_AUTH`` for client initialized
+    with Globalization Pipeline Authentication credentials. Note, at this
     time, only Reader-type accounts are allowed to use Basic authentication.
     """
 
@@ -218,7 +226,16 @@ class GPClient():
     def __prepare_gprest_call(self, requestURL, params=None, headers=None, restType='GET', body=None):
         """Returns Authorization type and GP headers
         """
-        if self.__auth == self.BASIC_AUTH:
+        if self.__serviceAccount.is_iam_enabled():
+            auth = None
+            iam_api_key_header = {
+                self.__AUTHORIZATION_HEADER_KEY: str('API-KEY '+self.__serviceAccount.get_api_key())
+            }
+            if not headers is None:
+                headers.update(iam_api_key_header)
+            else:
+                headers = iam_api_key_header
+        elif self.__auth == self.BASIC_AUTH:
             auth = (self.__serviceAccount.get_user_id(),
                     self.__serviceAccount.get_password())
         elif self.__auth == self.HMAC_AUTH:
@@ -282,6 +299,22 @@ class GPClient():
             r = requests.delete(requestURL, auth=auth, headers=headers, params=params)
         resp = self.__process_gprest_response(r, restType=restType)
         return resp
+
+
+    def createReaderUser(self,accessibleBundles=None):
+        """Creates a new reader user with access to the specified bundle Ids"""
+
+        url = self.__serviceAccount.get_url() + '/' + \
+              self.__serviceAccount.get_instance_id()+ '/v2/users/new'
+
+        headers = {'content-type': 'application/json'}
+        data = {}
+        data['type'] = 'READER'
+        if accessibleBundles is not None:
+            data['bundles']=accessibleBundles
+        json_data = json.dumps(data)
+        response = self.__perform_rest_call(requestURL=url, restType='POST', body=json_data, headers=headers)
+        return response
 
     def __get_bundles_data(self):
         """``GET {url}/{serviceInstanceId}/v2/bundles``

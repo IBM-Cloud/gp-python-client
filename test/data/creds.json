@@ -4,8 +4,10 @@
   "userId": "<gp credential userid>",
   "password": "<gp credential password>",
   "instanceId": "<gp instance id>",
-   "readerUserId": "<gp reader user id>",
+    "readerUserId": "<gp reader user id>",
   "readerPassword": "<gp reader password>",
+    "readerApiKey": "<gp reader api key>",
+    "adminApiKey": "<gp admin api key>",
     "gp-instance-name":"Globalization Pipeline DEV-py-client-test"
       
   }

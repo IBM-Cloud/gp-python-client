@@ -33,11 +33,10 @@ include ``French`` and ``Spanish`` as target languages.
 
 Once the bundles are created, you need to update ``data/creds.json``.
 
-You can find the ``url``, ``instanceId``, ``userId`` and ``password``
-in the service instance's Service Credentials section.
+Using service instance's Service Credentials section, create new IAM credentials for manager and reader role. You can find the ``url``, ``instanceId`` in the generated credentials. Use the ``apikey`` from manager role credentials for ``adminApiKey`. Use the ``apikey`` from reader role credentials for ``readerApiKey` `
 
-The reader account information (``readerUserId`` and ``readerPassword``)
-can be obtained by creating a new user with reader access. A new user can be
+GP reader (``readerUserId`` and ``readerPassword``) and admin (``userId`` and ``password``) account information
+can be obtained by creating a new user. A new user can be
 added in the service instance dashboard (``Manage > Users > New User``).
 
 Once everything has been updated. Head to the next section.

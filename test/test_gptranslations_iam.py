@@ -21,36 +21,37 @@ from gpclient import GPClient
 from test import common
 
 
-class TestGPTranslations(unittest.TestCase):
+@common.skipIfIamTestDisabled
+class TestGPTranslationsIam(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
         """Setting up the globalization pipeline for testing"""
-        acc = common.get_admin_gpserviceaccount()
+        acc = common.get_admin_gpserviceaccount(True)
         client = GPClient(acc)
         try:
             client.delete_bundle(common.bundleId1)
-            
+
             data = {}
             data['sourceLanguage'] = "en"
-            #data['targetLanguages'] = ["fr","es-mx"]
-            data['notes']=["string"]
-            data['metadata']={}
-            data['partner']=''
-            data['segmentSeparatorPattern']='string'
-            data['noTranslationPattern']='string'
-            
+            # data['targetLanguages'] = ["fr","es-mx"]
+            data['notes'] = ["string"]
+            data['metadata'] = {}
+            data['partner'] = ''
+            data['segmentSeparatorPattern'] = 'string'
+            data['noTranslationPattern'] = 'string'
+
             client.create_bundle(common.bundleId1, data=data)
             bundle1_entries = {}
-            bundle1_entries['greet']="Hello"
-            bundle1_entries['weather']="It is snowing"
-            client.upload_resource_entries(common.bundleId1,"en", data=bundle1_entries)
-
+            bundle1_entries['greet'] = "Hello"
+            bundle1_entries['weather'] = "It is snowing"
+            client.upload_resource_entries(common.bundleId1, "en", data=bundle1_entries)
 
             bundle2_entries = {}
             bundle2_entries['greet'] = "Salut"
             bundle2_entries['weather'] = "Il neige"
             client.upload_resource_entries(common.bundleId1, "fr", data=bundle2_entries)
+            
         except:
             pass
 
@@ -146,14 +147,14 @@ class TestGPTranslations(unittest.TestCase):
 
     def common_test_caching(self, cacheTimeout=None):
         """Shared code between the various caching tests """
-        acc = common.get_gpserviceaccount()
+        acc = common.get_gpserviceaccount(True)
 
         if cacheTimeout is None:
             client = GPClient(acc)
         else:
             client = GPClient(acc, cacheTimeout=cacheTimeout)
 
-        languages=['fr']
+        languages=['fr_CA']
         t = client.gp_translation(bundleId=common.bundleId1,
             languages=languages)
         _ = t.gettext

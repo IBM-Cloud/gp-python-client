@@ -8,7 +8,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 gp-python-client
 ----------------
-`gp-python-client` is the official Python client for [IBM Globalization Pipeline](https://www.ng.bluemix.net/docs/services/GlobalizationPipeline/index.html).
+`gp-python-client` is the official Python client for [IBM Globalization Pipeline](https://cloud.ibm.com/docs/services/GlobalizationPipeline).
 
 IBM Globalization Pipeline is a DevOps integrated application translation management service that you can use to rapidly translate and release cloud and mobile applications to your global customers. Access IBM Globalization Pipeline capabilities through its dashboard, RESTful API, or integrate it seamlessly into your application's Delivery Pipeline.
 
@@ -17,9 +17,9 @@ This package expands on the [gettext module](https://docs.python.org/2/library/g
 Getting started
 ---------------
 To get started, you should familiarize yourself with the service itself. A
-good place to begin is by reading the [Quick Start Guide](https://github.com/IBM-Bluemix/gp-common#quick-start-guide) and the official [Getting Started with IBM Globalization ](https://www.ng.bluemix.net/docs/services/GlobalizationPipeline/index.html) documentation.
+good place to begin is by reading the [Quick Start Guide](https://github.com/IBM-Cloud/gp-common#quick-start-guide) and the official [Getting Started with IBM Globalization ](https://cloud.ibm.com/docs/services/GlobalizationPipeline) documentation.
 
-The documentation explains how to find the service on Bluemix, create a new service instance, create a new bundle, and access the translated messages.
+The documentation explains how to find the service on IBM Cloud; authentication mechanisms supported; create a new service instance; create a new bundle; access the translated messages.
 
 Demo
 ----
@@ -77,7 +77,10 @@ You will need the [service instance credentials](https://github.com/IBM-Bluemix/
 >>> import locale
 >>>
 >>> acc = GPServiceAccount(url=url, instanceId=instId,
-    userId=userId, password=passwd)
+    userId=userId, password=passwd) # Using Globalization Pipeline authentication
+# Using IAM 
+# acc = GPServiceAccount(url=url, instanceId=instanceId,
+#                                apiKey=apiKey)
 >>> client = GPClient(acc)
 >>>
 >>> languages=[locale.getdefaultlocale()[0]] # languages=['es-mx']
@@ -188,7 +191,7 @@ $ pandoc --from markdown --to rst README.md -o README.rst
 
 Community
 ---------
-* View or file GitHub [Issues](https://github.com/IBM-Bluemix/gp-python-client/issues)
+* View or file GitHub [Issues](https://github.com/IBM-Cloud/gp-python-client/issues)
 * Connect with the open source community on [developerWorks Open](https://developer.ibm.com/open/ibm-bluemix-globalization-pipeline-service/python-sdk/)
 
 Contributing

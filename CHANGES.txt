@@ -1,1 +1,2 @@
+v1.1.0, Apr. 23 2019 -- IAM support.
 v1.0.0, Nov. 16 2015 -- Initial release.

@@ -4,6 +4,8 @@ python:
   - "3.4"
   - "3.6"
 # command to install dependencies
+before_script:
+  curl $GP_FAKE_BROKER > local-credentials.json
 # command to run tests
 script:
   python setup.py test
