@@ -179,16 +179,6 @@ $ python setup.py bdist
 
 The new distribution files should be located under `$BASEDIR/dist/`.
 
-Publishing to PyPI (internal only)
-----------------------------------
-PyPI requires that the README file be in [reStructuredText](https://en.wikipedia.org/wiki/ReStructuredText) format, but this README file is written in Markdown. Therefore, before publishing to PyPI, you must use [Pandoc](http://pandoc.org/) to convert the Markdown file to reStructuredText.
-
-Use the following command:
-
-```shell
-$ pandoc --from markdown --to rst README.md -o README.rst
-```
-
 Community
 ---------
 * View or file GitHub [Issues](https://github.com/IBM-Cloud/gp-python-client/issues)

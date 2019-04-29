@@ -12,6 +12,7 @@ setup(
     version='1.1.0',
     description='Python client for Globalization Pipeline on IBM Cloud',
     long_description=long_description,
+    long_description_content_type='text/markdown',
     url='https://github.com/IBM-Cloud/gp-python-client',
     author='Farhan Arshad',
     author_email='icuintl@us.ibm.com',
