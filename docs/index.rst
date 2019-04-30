@@ -20,7 +20,7 @@ gp-python-client
 Bluemix.
 
 For more information, refer to the project's `github page
-<https://github.com/IBM-Bluemix/gp-python-client>`_.
+<https://github.com/IBM-Cloud/gp-python-client>`_.
 
 API
 ---
@@ -30,9 +30,9 @@ API
 
 If the above link does not work, you can generate the documentation yourself
 (see `Generating documentation
-<https://github.com/IBM-Bluemix/gp-python-client/blob/master/README.md>`_).
+<https://github.com/IBM-Cloud/gp-python-client/blob/master/README.md>`_).
 
 License
 -------
 ``gp-python-client`` is published under the `Apache License Version 2.0
-<https://github.com/IBM-Bluemix/gp-python-client/blob/master/LICENSE.txt>`_.
+<https://github.com/IBM-Cloud/gp-python-client/blob/master/LICENSE.txt>`_.
