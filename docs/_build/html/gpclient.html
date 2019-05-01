@@ -1,0 +1,376 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>GPClient &#8212; gp-python-client 1.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="gp-python-client" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="gp-python-client"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">gp-python-client 1.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-gpclient.gpclient">
+<span id="gpclient"></span><h1>GPClient<a class="headerlink" href="#module-gpclient.gpclient" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="gpclient.gpclient.GPClient">
+<em class="property">class </em><code class="descclassname">gpclient.gpclient.</code><code class="descname">GPClient</code><span class="sig-paren">(</span><em>serviceAccount</em>, <em>auth='HMAC'</em>, <em>cacheTimeout=10</em><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpclient.GPClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Handles interaction with the Globalization Pipeline (GP) service
+instance. <code class="docutils literal notranslate"><span class="pre">serviceAccount</span></code> must be of type <code class="docutils literal notranslate"><span class="pre">GPServiceAccount</span></code> and will
+be used to obtain the necessary credentials required for contacting the
+Globalization Pipeline service instance. Access to Globalization Pipeline RC enabled service instances for users in
+is controlled by IBM Cloud Identity and Access Management (IAM) and/or Globalization Pipeline
+Authentication. Whereas for CF instances only Globalization Pipeline Authentication can be used.</p>
+<p>The caching feature may be used to cache translated values locally
+in order to reduce the number of calls made to the GP service. The
+<code class="docutils literal notranslate"><span class="pre">cacheTimeout</span></code> can have the following values (in minutes):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cacheTimeout</span> <span class="pre">=</span> <span class="pre">0</span></code>, do not cache</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cacheTimeout</span> <span class="pre">=</span> <span class="pre">-1</span></code>, cache forever</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cacheTimeout</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>, store cache value for specified number of minutes</p></li>
+</ul>
+<p>The default <code class="docutils literal notranslate"><span class="pre">cacheTimeout</span></code> value is <code class="docutils literal notranslate"><span class="pre">10</span></code> minutes</p>
+<p>The type of Globalization Pipeline authentication mechanism to use for requests can
+also be specified. Currently, the following are supported:</p>
+<ul class="simple">
+<li><p>HMAC authentication: <code class="docutils literal notranslate"><span class="pre">auth=GPClient.HMAC_AUTH</span></code></p></li>
+<li><p>HTTP Basic Access authentication: <code class="docutils literal notranslate"><span class="pre">auth=GPClient.BASIC_AUTH</span></code></p></li>
+</ul>
+<p>If the <code class="docutils literal notranslate"><span class="pre">serviceAccount</span></code> is initialized with IAM credentials, the client
+will use IAM authentication and ignore the <code class="docutils literal notranslate"><span class="pre">auth</span></code> specified.</p>
+<p>The default <code class="docutils literal notranslate"><span class="pre">auth</span></code> value is <code class="docutils literal notranslate"><span class="pre">GPClient.HMAC_AUTH</span></code> for client initialized
+with Globalization Pipeline Authentication credentials. Note, at this
+time, only Reader-type accounts are allowed to use Basic authentication.</p>
+<dl class="attribute">
+<dt id="gpclient.gpclient.GPClient.BASIC_AUTH">
+<code class="descname">BASIC_AUTH</code><em class="property"> = 'basic'</em><a class="headerlink" href="#gpclient.gpclient.GPClient.BASIC_AUTH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gpclient.gpclient.GPClient.HMAC_AUTH">
+<code class="descname">HMAC_AUTH</code><em class="property"> = 'HMAC'</em><a class="headerlink" href="#gpclient.gpclient.GPClient.HMAC_AUTH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gpclient.gpclient.GPClient.createReaderUser">
+<code class="descname">createReaderUser</code><span class="sig-paren">(</span><em>accessibleBundles=None</em><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpclient.GPClient.createReaderUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new reader user with access to the specified bundle Ids</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gpclient.gpclient.GPClient.create_bundle">
+<code class="descname">create_bundle</code><span class="sig-paren">(</span><em>bundleId</em>, <em>data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpclient.GPClient.create_bundle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a bundle using Globalization Pipeline service</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gpclient.gpclient.GPClient.delete_bundle">
+<code class="descname">delete_bundle</code><span class="sig-paren">(</span><em>bundleId</em><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpclient.GPClient.delete_bundle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns success(True) or failure(False) on deleting
+a specific bundle present in the Globalization pipeline</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gpclient.gpclient.GPClient.get_avaliable_languages">
+<code class="descname">get_avaliable_languages</code><span class="sig-paren">(</span><em>bundleId</em><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpclient.GPClient.get_avaliable_languages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of avaliable languages in the bundle</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gpclient.gpclient.GPClient.get_bundles">
+<code class="descname">get_bundles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpclient.GPClient.get_bundles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns list of avaliable bundles</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gpclient.gpclient.GPClient.gp_translation">
+<code class="descname">gp_translation</code><span class="sig-paren">(</span><em>bundleId</em>, <em>languages</em><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpclient.GPClient.gp_translation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an instance of <code class="docutils literal notranslate"><span class="pre">GPTranslations</span></code> to be used for obtaining
+translations.</p>
+<p><code class="docutils literal notranslate"><span class="pre">bundleId</span></code> is the name of the bundle to use. <code class="docutils literal notranslate"><span class="pre">languages</span></code> is the
+list of languages to use, with subsequent ones being fallbacks.
+For example, to fallback to Spanish if French translated values are not
+found, <code class="docutils literal notranslate"><span class="pre">languages=['fr',</span> <span class="pre">'es']</span></code>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gpclient.gpclient.GPClient.translation">
+<code class="descname">translation</code><span class="sig-paren">(</span><em>bundleId</em>, <em>languages</em>, <em>priority='gp'</em>, <em>domain=None</em>, <em>localedir=None</em>, <em>class_=None</em>, <em>codeset=None</em><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpclient.GPClient.translation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the <code class="docutils literal notranslate"><span class="pre">Translations</span></code> instance to be used for obtaining
+translations.</p>
+<p><code class="docutils literal notranslate"><span class="pre">bundleId</span></code> is the name of the bundle to use.
+<code class="docutils literal notranslate"><span class="pre">languages</span></code> is the list of languages to use, with subsequent ones
+being fallbacks. Additionally, based on the value of <code class="docutils literal notranslate"><span class="pre">priority</span></code>,
+local translated values can be given precedence over Globalization
+Pipeline translated values.</p>
+<p>For example, to fallback to Spanish if French translated values are not
+found, <code class="docutils literal notranslate"><span class="pre">languages=['fr',</span> <span class="pre">'es']</span></code>. And if <code class="docutils literal notranslate"><span class="pre">priority=gp</span></code>,
+the fallback chain will be as follows:</p>
+<ul class="simple">
+<li><p>use <code class="docutils literal notranslate"><span class="pre">gp</span></code> French translated value, if not found:</p></li>
+<li><p>use <code class="docutils literal notranslate"><span class="pre">local</span></code> French translated value, if not found:</p></li>
+<li><p>use <code class="docutils literal notranslate"><span class="pre">gp</span></code> Spanish translated value, if not found:</p></li>
+<li><p>use <code class="docutils literal notranslate"><span class="pre">local</span></code> Spanish translated value, if not found:</p></li>
+<li><p>use source value, if not found:</p></li>
+<li><p>use provided key</p></li>
+</ul>
+<p>In order to search for local translated values, the optional parameters
+must be provided according to <a class="reference external" href="https://docs.python.org/2/library/gettext.html#gettext.translation">gettext.translation</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gpclient.gpclient.GPClient.update_bundle_info">
+<code class="descname">update_bundle_info</code><span class="sig-paren">(</span><em>bundleId</em>, <em>data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpclient.GPClient.update_bundle_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the bundle config info on globalization pipeline instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gpclient.gpclient.GPClient.update_resource_entries">
+<code class="descname">update_resource_entries</code><span class="sig-paren">(</span><em>bundleId</em>, <em>languageId</em>, <em>data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpclient.GPClient.update_resource_entries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates a bunch of resource entries to be in sync
+with the key/value pairs in the globalization pipeline instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gpclient.gpclient.GPClient.update_resource_entry">
+<code class="descname">update_resource_entry</code><span class="sig-paren">(</span><em>bundleId</em>, <em>languageId</em>, <em>resourceKey</em>, <em>data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpclient.GPClient.update_resource_entry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the resource entry for a particular key in a target language
+for a specific bundle in the globalization pipeline</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gpclient.gpclient.GPClient.upload_resource_entries">
+<code class="descname">upload_resource_entries</code><span class="sig-paren">(</span><em>bundleId</em>, <em>languageId</em>, <em>data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpclient.GPClient.upload_resource_entries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uploads resource entries onto the globalization pipeline.
+Replaces all existing entries with new entries if languageId is source language
+Updates existing matching entries if languageId is target language</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-gpclient.gpserviceaccount">
+<span id="gpserviceaccount"></span><h1>GPServiceAccount<a class="headerlink" href="#module-gpclient.gpserviceaccount" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="gpclient.gpserviceaccount.GPServiceAccount">
+<em class="property">class </em><code class="descclassname">gpclient.gpserviceaccount.</code><code class="descname">GPServiceAccount</code><span class="sig-paren">(</span><em>url=None</em>, <em>instanceId=None</em>, <em>userId=None</em>, <em>password=None</em>, <em>serviceInstanceName=None</em>, <em>credentialsJson=None</em>, <em>apiKey=None</em><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpserviceaccount.GPServiceAccount" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="simple">
+<dt>Holds authentication details for connecting to the Globalization</dt><dd><p>Pipeline (GP) service instance. The service supports Globalization
+Pipeline Authentication and Identity and Access Management (IAM) authentication</p>
+</dd>
+</dl>
+<p>There are three options for creating a <code class="docutils literal notranslate"><span class="pre">GPServiceAccount</span></code> instance:</p>
+<blockquote>
+<div><p>1. Provide the parameters.
+Mandatory for both authentication mechanisms
+<code class="docutils literal notranslate"><span class="pre">url</span></code>, <code class="docutils literal notranslate"><span class="pre">instanceId</span></code>
+For Globalization Pipeline authentication:
+<code class="docutils literal notranslate"><span class="pre">userId</span></code> and <code class="docutils literal notranslate"><span class="pre">password</span></code>
+For IAM authentication:
+<code class="docutils literal notranslate"><span class="pre">apiKey</span></code></p>
+<p>If both Globalization Pipeline and IAM authentication credentials are provided then <code class="docutils literal notranslate"><span class="pre">GPServiceAccount</span></code>
+instance will be initialized with Globalization Pipeline authentication.</p>
+<p>2. Use the user defined environment variables (no params required).
+Mandatory for both authentication mechanisms:
+<code class="docutils literal notranslate"><span class="pre">GPServiceAccount.GP_URL_ENV_VAR</span></code>,
+<code class="docutils literal notranslate"><span class="pre">GPServiceAccount.GP_INSTANCE_ID_ENV_VAR</span></code></p>
+<p>For Globalization Pipeline authentication:
+<code class="docutils literal notranslate"><span class="pre">GPServiceAccount.GP_USER_ID_ENV_VAR</span></code>,
+<code class="docutils literal notranslate"><span class="pre">GPServiceAccount.GP_PASSWORD_ENV_VAR</span></code></p>
+<p>For IAM authentication:
+<code class="docutils literal notranslate"><span class="pre">GPServiceAccount.GP_IAM_API_KEY_ENV_VAR</span></code></p>
+<p>If both Globalization Pipeline and IAM authentication credentials are provided then <code class="docutils literal notranslate"><span class="pre">GPServiceAccount</span></code>
+instance will be initialized with Globalization Pipeline authentication.</p>
+<p>3. Search the <code class="docutils literal notranslate"><span class="pre">VCAP_SERVICES</span></code> environment variable for all avaliable
+GP service instances. If a service instance name is provided, it will
+be given precedence. (optional <code class="docutils literal notranslate"><span class="pre">serviceInstanceName</span></code> param)</p>
+</div></blockquote>
+<dl class="attribute">
+<dt id="gpclient.gpserviceaccount.GPServiceAccount.GP_IAM_API_KEY_ENV_VAR">
+<code class="descname">GP_IAM_API_KEY_ENV_VAR</code><em class="property"> = 'GP_IAM_API_KEY'</em><a class="headerlink" href="#gpclient.gpserviceaccount.GPServiceAccount.GP_IAM_API_KEY_ENV_VAR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gpclient.gpserviceaccount.GPServiceAccount.GP_INSTANCE_ID_ENV_VAR">
+<code class="descname">GP_INSTANCE_ID_ENV_VAR</code><em class="property"> = 'GP_INSTANCE_ID'</em><a class="headerlink" href="#gpclient.gpserviceaccount.GPServiceAccount.GP_INSTANCE_ID_ENV_VAR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gpclient.gpserviceaccount.GPServiceAccount.GP_PASSWORD_ENV_VAR">
+<code class="descname">GP_PASSWORD_ENV_VAR</code><em class="property"> = 'GP_PASSWORD'</em><a class="headerlink" href="#gpclient.gpserviceaccount.GPServiceAccount.GP_PASSWORD_ENV_VAR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gpclient.gpserviceaccount.GPServiceAccount.GP_URL_ENV_VAR">
+<code class="descname">GP_URL_ENV_VAR</code><em class="property"> = 'GP_URL'</em><a class="headerlink" href="#gpclient.gpserviceaccount.GPServiceAccount.GP_URL_ENV_VAR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="gpclient.gpserviceaccount.GPServiceAccount.GP_USER_ID_ENV_VAR">
+<code class="descname">GP_USER_ID_ENV_VAR</code><em class="property"> = 'GP_USER_ID'</em><a class="headerlink" href="#gpclient.gpserviceaccount.GPServiceAccount.GP_USER_ID_ENV_VAR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="gpclient.gpserviceaccount.GPServiceAccount.get_api_key">
+<code class="descname">get_api_key</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpserviceaccount.GPServiceAccount.get_api_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the <code class="docutils literal notranslate"><span class="pre">IAM</span> <span class="pre">API</span> <span class="pre">Key</span></code> being used by this <code class="docutils literal notranslate"><span class="pre">GPServiceAccount</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gpclient.gpserviceaccount.GPServiceAccount.get_instance_id">
+<code class="descname">get_instance_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpserviceaccount.GPServiceAccount.get_instance_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the <code class="docutils literal notranslate"><span class="pre">instanceId</span></code> being used by this <code class="docutils literal notranslate"><span class="pre">GPServiceAccount</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gpclient.gpserviceaccount.GPServiceAccount.get_password">
+<code class="descname">get_password</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpserviceaccount.GPServiceAccount.get_password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the <code class="docutils literal notranslate"><span class="pre">password</span></code> being used by this <code class="docutils literal notranslate"><span class="pre">GPServiceAccount</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gpclient.gpserviceaccount.GPServiceAccount.get_url">
+<code class="descname">get_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpserviceaccount.GPServiceAccount.get_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the <code class="docutils literal notranslate"><span class="pre">url</span></code> being used by this <code class="docutils literal notranslate"><span class="pre">GPServiceAccount</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gpclient.gpserviceaccount.GPServiceAccount.get_user_id">
+<code class="descname">get_user_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpserviceaccount.GPServiceAccount.get_user_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the <code class="docutils literal notranslate"><span class="pre">userId</span></code> being used by this <code class="docutils literal notranslate"><span class="pre">GPServiceAccount</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="gpclient.gpserviceaccount.GPServiceAccount.is_iam_enabled">
+<code class="descname">is_iam_enabled</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gpserviceaccount.GPServiceAccount.is_iam_enabled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true if the <code class="docutils literal notranslate"><span class="pre">GPServiceAccount</span></code> being used is IAM enabled</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-gpclient.gptranslations">
+<span id="gptranslations"></span><h1>GPTranslations<a class="headerlink" href="#module-gpclient.gptranslations" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="gpclient.gptranslations.GPTranslations">
+<em class="property">class </em><code class="descclassname">gpclient.gptranslations.</code><code class="descname">GPTranslations</code><span class="sig-paren">(</span><em>client</em>, <em>bundleId</em>, <em>languageId</em>, <em>cacheTimeout</em>, <em>fp=None</em><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gptranslations.GPTranslations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gettext.NullTranslations</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">GPTranslations</span></code> extends <a class="reference external" href="https://docs.python.org/2/library/gettext.html#gettext.NullTranslations">gettext.NullTranslations</a>
+and performs a similar function to <a class="reference external" href="https://docs.python.org/2/library/gettext.html#the-gnutranslations-class">gettext.GNUTranslations</a>
+; however, instead of using the translations in local <code class="docutils literal notranslate"><span class="pre">mo</span></code> files, it uses
+those provided by Globalization Pipeline (GP).</p>
+<p>NOTE: It is recommended that the <code class="docutils literal notranslate"><span class="pre">GPTranslations</span></code> constructor not be used
+directly - instead <code class="docutils literal notranslate"><span class="pre">GPClient.translation</span></code> or <code class="docutils literal notranslate"><span class="pre">GPClient.gp_translation</span></code>
+should be used, which will create and return a <code class="docutils literal notranslate"><span class="pre">GPTranslations</span></code> instance.</p>
+<dl class="method">
+<dt id="gpclient.gptranslations.GPTranslations.gettext">
+<code class="descname">gettext</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="headerlink" href="#gpclient.gptranslations.GPTranslations.gettext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contacts the GP service instance to find the translated value for
+the provided message key.</p>
+<p>If translated value is not available, and a fallback has been set,
+the fallback will be used. If there is no fallback, the source language
+value is returned. And if the message key is not found, the message
+key itself will be returned.</p>
+<p>The caching feature may be used to cache translated values locally
+in order to reduce the number of calls made to the GP service.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cacheTimeout</span> <span class="pre">=</span> <span class="pre">0</span></code>, do not cache</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cacheTimeout</span> <span class="pre">=</span> <span class="pre">-1</span></code>, cache forever</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cacheTimeout</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>, store cache value for specified number of             minutes</p></li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">GPClient</a></li>
+<li><a class="reference internal" href="#module-gpclient.gpserviceaccount">GPServiceAccount</a></li>
+<li><a class="reference internal" href="#module-gpclient.gptranslations">GPTranslations</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">gp-python-client</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/gpclient.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="gp-python-client"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">gp-python-client 1.1.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015, IBM.
+      Last updated on Apr 30, 2019.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

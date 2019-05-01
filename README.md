@@ -41,7 +41,7 @@ $ easy_install gp-python-client
 
 API
 ---
-The API documentation for the package can be found [here](http://pythonhosted.org/gp-python-client/). If the link is broken, you can [generate the documentation ](#generating-documentation) yourself.
+The API documentation for the package can be found [here](https://ibm-cloud.github.io/gp-python-client/). If the link is broken, you can [generate the documentation ](#generating-documentation) yourself.
 
 Examples
 --------
