@@ -23,7 +23,7 @@ The documentation explains how to find the service on IBM Cloud; authentication 
 
 Demo
 ----
-This [demo Bluemix app](http://gp-python-client-demo.mybluemix.net/) uses the Globalization Pipeline with the Python client to display a short welcome message that is translated in several languages. The source code for the demo app can be found in the [demo dir](./demo).
+This [demo Bluemix app](https://gp-py-client.mybluemix.net/) uses the Globalization Pipeline with the Python client to display a short welcome message that is translated in several languages. The source code for the demo app can be found in the [demo dir](./demo).
 
 Installation
 ------------
