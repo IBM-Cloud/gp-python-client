@@ -102,6 +102,7 @@ class GPServiceAccount():
                  serviceInstanceName=None, credentialsJson=None, apiKey=None):
         credentialsSet = False
         if url and instanceId:
+            logging.info('Trying to initialize by params')
             if userId and password:
                 self.__setcreds__(url, instanceId, userId, password)
                 credentialsSet = True
@@ -110,7 +111,10 @@ class GPServiceAccount():
                 self.__setIamCreds__(url, instanceId, apiKey)
                 credentialsSet = True
                 logging.info('using user provided data to create GPServiceAccount supporting IAM auth.')
+            if credentialsSet:
+                logging.info('Successfully completed initialization by params')
         if not credentialsSet:
+            logging.info('Trying to initialize by user env')
             (url, instanceId, userId, password, apiKey) = self.__get_user_env_vars()
             if url and instanceId:
                 if userId and password:
@@ -123,7 +127,26 @@ class GPServiceAccount():
                     credentialsSet = True
                     logging.info("""using user defined environment variables to
                                     create GPServiceAccount supporting IAM auth.""")
-        if not credentialsSet and serviceInstanceName is not None:
+            if credentialsSet:
+                logging.info('Successfully completed initialization by user env variables')
+        if not credentialsSet and credentialsJson is not None:
+            logging.info('Trying to initialize by credentials file')
+            (url, instanceId, userId, password, apiKey) = self.__get_credentials_from_file(credentialsJson)
+            if url and instanceId:
+                if userId and password:
+                    self.__setcreds__(url, instanceId, userId, password)
+                    credentialsSet = True
+                    logging.info("""using user defined environment variables to
+                        create GPServiceAccount""")
+                elif apiKey:
+                    self.__setcreds__(url, instanceId, apiKey)
+                    credentialsSet = True
+                    logging.info("""using user defined environment variables to
+                        create GPServiceAccount supporting IAM auth.""")
+            if credentialsSet:
+                logging.info('Successfully completed initialization by credentials file')
+        if not credentialsSet:
+            logging.info('Trying to initialize by vcap_services env var')
             (url, instanceId, userId, password, apiKey) = \
                     self.__parse_vcap_services_env_var(serviceInstanceName)
             if url and instanceId:
@@ -137,20 +160,11 @@ class GPServiceAccount():
                     credentialsSet = True
                     logging.info("""using VCAP_SERVICES environment variable to
                             create GPServiceAccount supporting IAM auth.""")
-        if not credentialsSet and credentialsJson is not None:
-            (url, instanceId, userId, password, apiKey) = self.__get_credentials_from_file(credentialsJson)
-            if url and instanceId:
-                if userId and password:
-                    self.__setcreds__(url, instanceId, userId, password)
-                    credentialsSet = True
-                    logging.info("""using user defined environment variables to
-                        create GPServiceAccount""")
-                elif apiKey:
-                    self.__setcreds__(url, instanceId, apiKey)
-                    credentialsSet = True
-                    logging.info("""using user defined environment variables to
-                        create GPServiceAccount supporting IAM auth.""")
+            if credentialsSet:
+                logging.info('Successfully completed initialization by vcap_services env var')
         # make sure that all the vars are set
+        if not credentialsSet:
+            logging.error("Failed to initialize service account by any of the available init methods.")
         assert self.__url, ('url is not a string: <%s>' % self.__url)
         assert self.__instanceId, ('instanceId is not a string: <%s>' %self.__instanceId)
         if self.__iamEnabled:

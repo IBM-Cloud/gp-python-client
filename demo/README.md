@@ -17,8 +17,7 @@ What is this?
 This is a demo Python app which uses the Globalization Pipeline service on
 Bluemix. Note that this app is designed to be run on Bluemix.
 
-A running instance of the demo can be found [here](
-http://gp-python-client-demo.mybluemix.net/).
+A running instance of the demo can be found [here](https://gp-py-client.mybluemix.net/).
 
 Prepare demo
 -------------

@@ -13,15 +13,15 @@
 # limitations under the License.
 
 import os, logging
-from gpclient import GPClient, GPServiceAccount, GPTranslations
+from gpclient import GPClient, GPServiceAccount
 from flask import Flask, render_template
 
 app = Flask(__name__)
 
-
 @app.route('/')
 @app.route('/index.html')
 def root():
+    logging.info('Processing request')
     # 1 - create GPServiceAccount
     # if the app is running on Bluemix, the credentials will be obtained
     # from the VCAP environment variable
@@ -29,13 +29,13 @@ def root():
     try:
         acc = GPServiceAccount()
     except AssertionError:
-        logging.error('Unable to create GPServiceAccount')
+        logging.error('Unable to create GPServiceAccount', exc_info=True)
         return
 
     # 2 - create Globalization Pipeline client
     # the client is responsible for communication with the service
     client = GPClient(acc)
-
+    logging.info('GP Client setup complete')
     bundleId='demo'
 
     # for the demo, get all avalible languages in the bundle
