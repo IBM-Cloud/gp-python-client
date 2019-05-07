@@ -1,3 +1,4 @@
+v1.1.2, May  06 2019 -- Update demo link.
 v1.1.1, May  03 2019 -- Update Api documentation link. Allow GPServiceAccount to initialize without serviceInstanceName.
 v1.1.0, Apr. 23 2019 -- IAM support.
 v1.0.0, Nov. 16 2015 -- Initial release.

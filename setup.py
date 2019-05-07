@@ -9,7 +9,7 @@ with open(path.join(currentDir, 'README.md'), encoding='utf-8') as readme:
 
 setup(
     name='gp-python-client',
-    version='1.1.1',
+    version='1.1.2',
     description='Python client for Globalization Pipeline on IBM Cloud',
     long_description=long_description,
     long_description_content_type='text/markdown',
